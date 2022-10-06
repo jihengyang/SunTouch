@@ -13,13 +13,13 @@ class SunTouchView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
-        SunLog.log("dispatchTouchEvent")
-        return super.dispatchTouchEvent(event)
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        SunLog.log("dispatchTouchEvent, action:${ev.actionMasked}")
+        return super.dispatchTouchEvent(ev)
     }
 
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        SunLog.log("onTouchEvent")
-        return super.onTouchEvent(event)
+    override fun onTouchEvent(ev: MotionEvent): Boolean {
+        SunLog.log("onTouchEvent, action:${ev.actionMasked}")
+        return super.onTouchEvent(ev)
     }
 }

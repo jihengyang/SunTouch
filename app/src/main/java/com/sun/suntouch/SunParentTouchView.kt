@@ -12,19 +12,19 @@ import android.widget.FrameLayout
 class SunParentTouchView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
-    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        SunLog.log("parent dispatchTouchEvent")
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        SunLog.log("parent dispatchTouchEvent, action:${ev.actionMasked}")
         return super.dispatchTouchEvent(ev)
     }
 
-    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
-        SunLog.log("parent onInterceptTouchEvent")
+    override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
+        SunLog.log("parent onInterceptTouchEvent, action:${ev.actionMasked}")
         return super.onInterceptTouchEvent(ev)
     }
 
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        SunLog.log("parent onTouchEvent")
+    override fun onTouchEvent(ev: MotionEvent): Boolean {
+        SunLog.log("parent onTouchEvent, action:${ev.actionMasked}")
 //        requestDisallowInterceptTouchEvent()
-        return super.onTouchEvent(event)
+        return super.onTouchEvent(ev)
     }
 }
