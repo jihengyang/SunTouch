@@ -4,9 +4,12 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
+import android.view.VelocityTracker
 import android.view.View
 import android.view.ViewConfiguration
 import android.widget.FrameLayout
+import android.widget.Scroller
+import androidx.core.view.ViewCompat
 import com.sun.suntouch.consumer.IScrollConsumer
 import com.sun.suntouch.consumer.createScrollState
 import kotlin.math.abs
@@ -25,16 +28,23 @@ class ComponentContainer @JvmOverloads constructor(
 
     private var lastTouchX = 0.0f
     private var lastTouchY = 0.0f
+    private var lastFlingY = 0
     private val touchSlop by lazy { ViewConfiguration.get(context).scaledTouchSlop }
+    private val maxScrollVelocity by lazy { ViewConfiguration.get(context).scaledMaximumFlingVelocity }
+    private val minScrollVelocity by lazy { ViewConfiguration.get(context).scaledMinimumFlingVelocity }
+    private var velocityTracker:VelocityTracker? = null
+    private val scroller by lazy { Scroller(context) }
     private var scrollY = 0.0f
 
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         ev ?: return false
-        log("onInterceptTouchEvent, action:${ev.action}")
+//        log("onInterceptTouchEvent, action:${ev.action}")
         when (ev.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 lastTouchX = ev.x
                 lastTouchY = ev.y
+                lastFlingY = 0
+                scroller.abortAnimation()
                 return false
             }
 
@@ -56,7 +66,11 @@ class ComponentContainer @JvmOverloads constructor(
 
     override fun onTouchEvent(ev: MotionEvent?): Boolean {
         ev ?: return true
-        log("onTouchEvent, action:${ev.action}")
+        if (velocityTracker == null) {
+            velocityTracker = VelocityTracker.obtain()
+        }
+        velocityTracker?.addMovement(ev)
+//        log("onTouchEvent, action:${ev.action}, y:${ev.y}")
         when (ev.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 return true
@@ -68,11 +82,30 @@ class ComponentContainer @JvmOverloads constructor(
                 lastTouchY = ev.y
             }
 
-            MotionEvent.ACTION_UP,
-            MotionEvent.ACTION_CANCEL -> {
+            MotionEvent.ACTION_UP -> {
+                velocityTracker!!.computeCurrentVelocity(1000, maxScrollVelocity.toFloat())
+                val velocity = velocityTracker!!.yVelocity
+                if (abs(velocity) > minScrollVelocity) {
+                    //do fling
+                    log("start fling, velocity:${-velocity.toInt()}")
+                    scroller.fling(0, 0, 0, -velocity.toInt(), 0, Int.MAX_VALUE, Int.MIN_VALUE, Int.MAX_VALUE)
+                    ViewCompat.postInvalidateOnAnimation(this)
+                }
+                velocityTracker!!.recycle()
+                velocityTracker = null
             }
         }
         return super.onTouchEvent(ev)
+    }
+
+    override fun computeScroll() {
+        log("computeScroll, currY:${scroller.currY}")
+        if (!scroller.computeScrollOffset()) {
+            return
+        }
+        customScrollBy(0, scroller.currY - lastFlingY)
+        ViewCompat.postInvalidateOnAnimation(this)
+        lastFlingY = scroller.currY
     }
 
     private fun canScroll() = headView!!.height - hangingView!!.height > scrollY
