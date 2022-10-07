@@ -19,12 +19,21 @@ class SunParentTouchView @JvmOverloads constructor(
 
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         SunLog.log("parent onInterceptTouchEvent, action:${ev.actionMasked}")
+//        if (ev.actionMasked == MotionEvent.ACTION_DOWN) {
+//            return true
+//        }
+        if (ev.actionMasked == MotionEvent.ACTION_DOWN) {
+            return true
+        }
         return super.onInterceptTouchEvent(ev)
     }
 
     override fun onTouchEvent(ev: MotionEvent): Boolean {
         SunLog.log("parent onTouchEvent, action:${ev.actionMasked}")
 //        requestDisallowInterceptTouchEvent()
+        if (ev.actionMasked == MotionEvent.ACTION_DOWN) {
+            return true
+        }
         return super.onTouchEvent(ev)
     }
 }
