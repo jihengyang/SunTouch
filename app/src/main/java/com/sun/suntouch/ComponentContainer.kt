@@ -40,20 +40,10 @@ class ComponentContainer @JvmOverloads constructor(
             }
 
             MotionEvent.ACTION_MOVE -> {
-                if (canScroll()) {
-                    val diffY = ev.y - lastTouchY
-                    if (diffY < 0) { //上划
-                        scrollY -= diffY
-                        headView!!.translationY = -scrollY
-                        contentView!!.translationY = headView!!.height - scrollY
-                    }
-                    return true
-                }
             }
 
             MotionEvent.ACTION_UP,
             MotionEvent.ACTION_CANCEL -> {
-
             }
         }
 
@@ -65,30 +55,15 @@ class ComponentContainer @JvmOverloads constructor(
         log("onTouchEvent, action:${ev.action}")
         when (ev.action) {
             MotionEvent.ACTION_DOWN -> {
-//                lastTouchX = ev.x
-//                lastTouchY = ev.y
-//                if (canScroll()) {
-//                    return true
-//                }
+                return true
             }
 
             MotionEvent.ACTION_MOVE -> {
-                val diffY = ev.y - lastTouchY
-//                Log.i("ComponentContainer", "diffY:$diffY")
-//                val canScroll = headView!!.height - hangingView!!.height - scrollY > diffY
-//                if (canScroll) {
-//                    scrollY = scaleY
-//                    headView!!.translationY = scrollY + diffY
-//                    contentView?.translationY = headView!!.height + headView!!.translationY
-//                }
-                lastTouchX = ev.x
-                lastTouchY = ev.y
-                return true
+
             }
 
             MotionEvent.ACTION_UP,
             MotionEvent.ACTION_CANCEL -> {
-
             }
         }
         return super.onTouchEvent(ev)
