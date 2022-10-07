@@ -32,7 +32,7 @@ class ComponentContainer @JvmOverloads constructor(
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         ev ?: return false
         log("onInterceptTouchEvent, action:${ev.action}")
-        when (ev.action) {
+        when (ev.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 lastTouchX = ev.x
                 lastTouchY = ev.y
@@ -40,6 +40,7 @@ class ComponentContainer @JvmOverloads constructor(
             }
 
             MotionEvent.ACTION_MOVE -> {
+
             }
 
             MotionEvent.ACTION_UP,
@@ -53,7 +54,7 @@ class ComponentContainer @JvmOverloads constructor(
     override fun onTouchEvent(ev: MotionEvent?): Boolean {
         ev ?: return true
         log("onTouchEvent, action:${ev.action}")
-        when (ev.action) {
+        when (ev.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 return true
             }
