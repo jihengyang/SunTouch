@@ -7,6 +7,8 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
 import android.widget.FrameLayout
+import com.sun.suntouch.consumer.IScrollConsumer
+import com.sun.suntouch.consumer.createScrollState
 import kotlin.math.abs
 
 /**
@@ -19,15 +21,12 @@ class ComponentContainer @JvmOverloads constructor(
     var headView: View? = null
     var hangingView: View? = null
     var contentView: View? = null
+    var scrollConsumers: List<IScrollConsumer> = emptyList()
 
     private var lastTouchX = 0.0f
     private var lastTouchY = 0.0f
     private val touchSlop by lazy { ViewConfiguration.get(context).scaledTouchSlop }
     private var scrollY = 0.0f
-
-    fun doBinding() {
-        contentView?.translationY = headView?.height?.toFloat() ?: 0.0f
-    }
 
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         ev ?: return false
@@ -40,7 +39,11 @@ class ComponentContainer @JvmOverloads constructor(
             }
 
             MotionEvent.ACTION_MOVE -> {
-
+                val diffY = lastTouchY - ev.y
+                if (abs(diffY) < touchSlop) {
+                    return false
+                }
+                return true
             }
 
             MotionEvent.ACTION_UP,
@@ -60,7 +63,9 @@ class ComponentContainer @JvmOverloads constructor(
             }
 
             MotionEvent.ACTION_MOVE -> {
-
+                customScrollBy(0, (lastTouchY - ev.y).toInt())
+                lastTouchX = ev.x
+                lastTouchY = ev.y
             }
 
             MotionEvent.ACTION_UP,
@@ -71,6 +76,19 @@ class ComponentContainer @JvmOverloads constructor(
     }
 
     private fun canScroll() = headView!!.height - hangingView!!.height > scrollY
+
+    fun customScrollBy(x: Int, y: Int) {
+        val scrollState = createScrollState(x, y)
+        if (y > 0) {
+            scrollConsumers.forEach {
+                it.onScroll(scrollState)
+            }
+        } else {
+            scrollConsumers.asReversed().forEach {
+                it.onScroll(scrollState)
+            }
+        }
+    }
 
     fun log(str: String) {
         Log.i("ComponentContainer", str)
