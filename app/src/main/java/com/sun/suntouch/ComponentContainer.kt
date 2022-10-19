@@ -21,9 +21,6 @@ import kotlin.math.abs
 class ComponentContainer @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
-    var headView: View? = null
-    var hangingView: View? = null
-    var contentView: View? = null
     var scrollConsumers: List<IScrollConsumer> = emptyList()
 
     private var lastTouchX = 0.0f
@@ -32,13 +29,11 @@ class ComponentContainer @JvmOverloads constructor(
     private val touchSlop by lazy { ViewConfiguration.get(context).scaledTouchSlop }
     private val maxScrollVelocity by lazy { ViewConfiguration.get(context).scaledMaximumFlingVelocity }
     private val minScrollVelocity by lazy { ViewConfiguration.get(context).scaledMinimumFlingVelocity }
-    private var velocityTracker:VelocityTracker? = null
+    private var velocityTracker: VelocityTracker? = null
     private val scroller by lazy { Scroller(context) }
-    private var scrollY = 0.0f
 
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         ev ?: return false
-//        log("onInterceptTouchEvent, action:${ev.action}")
         when (ev.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 lastTouchX = ev.x
@@ -108,8 +103,6 @@ class ComponentContainer @JvmOverloads constructor(
         lastFlingY = scroller.currY
     }
 
-    private fun canScroll() = headView!!.height - hangingView!!.height > scrollY
-
     fun customScrollBy(x: Int, y: Int) {
         val scrollState = createScrollState(x, y)
         if (y > 0) {
@@ -123,9 +116,8 @@ class ComponentContainer @JvmOverloads constructor(
         }
     }
 
-    fun log(str: String) {
+    private fun log(str: String) {
         Log.i("ComponentContainer", str)
     }
-
 
 }
